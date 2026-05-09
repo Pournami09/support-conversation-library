@@ -50,6 +50,11 @@ const PATHS = {
   sliders:    "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
   tag:        "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z",
   plug:       "M12 18h.01M8 21l4-4 4 4M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+  trendDown:  "M13 17h8m0 0V9m0 8l-8-8-4 4-6-6",
+  bookmark:   "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z",
+  billing:    "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
+  shield:     "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  rocket:     "M13 10V3L4 14h7v7l9-11h-7z",
 }
 
 // ── Nav structure ─────────────────────────────────────────────────────────
@@ -59,20 +64,30 @@ interface Section  { id: string; label: string; icon: string; items: SubItem[] }
 
 const NAV_SECTIONS: Section[] = [
   {
-    id: 'home', label: 'Home', icon: 'home',
+    id: 'home', label: 'Library', icon: 'home',
     items: [
-      { label: 'Dashboard',       href: '/',           icon: 'grid'      },
-      { label: 'Recent Activity', href: '/activity',   icon: 'clock'     },
-      { label: 'Favorites',       href: '/favorites',  icon: 'star'      },
+      { label: 'Search',        href: '/',            icon: 'grid'      },
+      { label: 'Saved Views',   href: '/collections', icon: 'bookmark'  },
+      { label: 'Recent',        href: '/activity',    icon: 'clock'     },
     ],
   },
   {
-    id: 'transcripts', label: 'Transcripts', icon: 'transcripts',
+    id: 'transcripts', label: 'Calls', icon: 'transcripts',
     items: [
-      { label: 'All Calls',    href: '/transcripts',          icon: 'phone'      },
-      { label: 'Flagged',      href: '/transcripts/flagged',  icon: 'flag'       },
-      { label: 'Needs Review', href: '/transcripts/review',   icon: 'clock'      },
-      { label: 'Archived',     href: '/transcripts/archived', icon: 'archive'    },
+      { label: 'All Calls',    href: '/transcripts',                     icon: 'phone'      },
+      { label: 'Escalations',  href: '/search?q=escalation',             icon: 'flag'       },
+      { label: 'Churn Risk',   href: '/search?q=churn+risk',             icon: 'trendDown'  },
+      { label: 'Needs Review', href: '/search?q=needs+review',           icon: 'clock'      },
+    ],
+  },
+  {
+    id: 'themes', label: 'Themes', icon: 'analytics',
+    items: [
+      { label: 'All Themes',        href: '/themes',                           icon: 'grid'      },
+      { label: 'Onboarding',        href: '/themes?theme=onboarding-friction', icon: 'rocket'    },
+      { label: 'Billing',           href: '/themes?theme=billing-confusion',   icon: 'billing'   },
+      { label: 'SSO Issues',        href: '/themes?theme=sso-login-failures',  icon: 'shield'    },
+      { label: 'Churn Intent',      href: '/themes?theme=cancellation-churn-intent', icon: 'trendDown' },
     ],
   },
   {
@@ -81,15 +96,6 @@ const NAV_SECTIONS: Section[] = [
       { label: 'My Queue',    href: '/reviews/queue',     icon: 'listCheck'  },
       { label: 'Team Queue',  href: '/reviews/team',      icon: 'users'      },
       { label: 'Completed',   href: '/reviews/completed', icon: 'checkCircle'},
-    ],
-  },
-  {
-    id: 'analytics', label: 'Analytics', icon: 'analytics',
-    items: [
-      { label: 'Overview',          href: '/analytics',         icon: 'grid'      },
-      { label: 'Agent Performance', href: '/analytics/agents',  icon: 'userCheck' },
-      { label: 'Quality Scores',    href: '/analytics/quality', icon: 'star'      },
-      { label: 'Trends',            href: '/analytics/trends',  icon: 'trendUp'   },
     ],
   },
   {
@@ -166,10 +172,12 @@ function RailTooltip({ label, children }: { label: string; children: React.React
 
 function getActiveSectionId(pathname: string): string {
   if (pathname.startsWith('/transcripts')) return 'transcripts'
+  if (pathname.startsWith('/search'))      return 'transcripts'
+  if (pathname.startsWith('/themes'))      return 'themes'
   if (pathname.startsWith('/reviews'))     return 'reviews'
-  if (pathname.startsWith('/analytics'))   return 'analytics'
   if (pathname.startsWith('/customers'))   return 'customers'
   if (pathname.startsWith('/settings'))    return 'settings'
+  if (pathname.startsWith('/collections')) return 'home'
   return 'home'
 }
 
@@ -183,9 +191,8 @@ function isSubActive(href: string, pathname: string): boolean {
 function SubNavItem({ item, pathname }: { item: SubItem; pathname: string }) {
   const active = isSubActive(item.href, pathname)
   return (
+    <Link href={item.href} style={{ textDecoration: 'none' }}>
     <Box
-      as={Link}
-      href={item.href}
       display="flex"
       alignItems="center"
       gap={3}
@@ -209,6 +216,7 @@ function SubNavItem({ item, pathname }: { item: SubItem; pathname: string }) {
         {item.label}
       </Text>
     </Box>
+    </Link>
   )
 }
 
@@ -363,21 +371,21 @@ export function Sidebar() {
         {/* Footer icons */}
         <Stack gap={1} align="center">
           <RailTooltip label="Help">
-            <Box
-              as={Link}
-              href="/help"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              w="40px"
-              h="40px"
-              rounded="sm"
-              color="var(--chakra-colors-fg-muted)"
-              _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-600)' }}
-              transition="background-color 0.15s ease, color 0.15s ease"
-            >
-              <Rail d={PATHS.help} />
-            </Box>
+            <Link href="/help">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                w="40px"
+                h="40px"
+                rounded="sm"
+                color="var(--chakra-colors-fg-muted)"
+                _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-600)' }}
+                transition="background-color 0.15s ease, color 0.15s ease"
+              >
+                <Rail d={PATHS.help} />
+              </Box>
+            </Link>
           </RailTooltip>
 
           {FOOTER_SECTIONS.map(s => (
@@ -393,23 +401,23 @@ export function Sidebar() {
 
           {/* Profile avatar */}
           <RailTooltip label="Profile">
-            <Box
-              as={Link}
-              href="/profile"
-              w="32px"
-              h="32px"
-              rounded="full"
-              bg="var(--chakra-colors-blue-500)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              mt={1}
-              flexShrink={0}
-              _hover={{ opacity: 0.85 }}
-              transition="opacity 0.15s ease"
-            >
-              <Text fontSize="10px" fontWeight="bold" color="white">PP</Text>
-            </Box>
+            <Link href="/profile">
+              <Box
+                w="32px"
+                h="32px"
+                rounded="full"
+                bg="var(--chakra-colors-blue-500)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                mt={1}
+                flexShrink={0}
+                _hover={{ opacity: 0.85 }}
+                transition="opacity 0.15s ease"
+              >
+                <Text fontSize="10px" fontWeight="bold" color="white">PP</Text>
+              </Box>
+            </Link>
           </RailTooltip>
         </Stack>
       </Flex>

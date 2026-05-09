@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Box, Flex, Input, Text } from '@chakra-ui/react'
 
 function IconSearch() {
@@ -11,6 +13,16 @@ function IconSearch() {
 }
 
 export function TopBar() {
+  const router = useRouter()
+  const [value, setValue] = useState('')
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && value.trim()) {
+      router.push(`/search?q=${encodeURIComponent(value.trim())}`)
+      setValue('')
+    }
+  }
+
   return (
     <Flex
       h="44px"
@@ -32,13 +44,18 @@ export function TopBar() {
       </Box>
 
       <Input
-        placeholder="Search transcripts, customers, agents..."
-        variant="unstyled"
+        placeholder="Search calls, issues, quotes, accounts, or themes…"
+        border="none"
+        outline="none"
+        _focusVisible={{ boxShadow: 'none' }}
         fontSize="sm"
         color="var(--chakra-colors-fg-default)"
         _placeholder={{ color: 'var(--chakra-colors-fg-muted)', fontSize: 'sm' }}
         flex={1}
         h="full"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
 
       <Flex
