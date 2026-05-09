@@ -1,0 +1,28 @@
+import type { Metadata } from 'next'
+import { Provider } from '@/components/ui/provider'
+
+export const metadata: Metadata = {
+  title: 'CS Tool',
+  description: 'Support conversation library',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <style>{`
+          @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+            }
+          }
+        `}</style>
+      </head>
+      <body>
+        <Provider>{children}</Provider>
+      </body>
+    </html>
+  )
+}
