@@ -234,4 +234,16 @@ export function getCallDetail(id: string): CallDetailData | undefined {
   } as CallDetailData
 }
 
+// Memoised: computed once per process, shared across all pages.
+let _allCallDetails: CallDetailData[] | null = null
+
+export function getAllCallDetails(): CallDetailData[] {
+  if (!_allCallDetails) {
+    _allCallDetails = TRANSCRIPTS
+      .map(t => getCallDetail(t.id))
+      .filter((c): c is CallDetailData => !!c)
+  }
+  return _allCallDetails
+}
+
 export { TRANSCRIPTS }
