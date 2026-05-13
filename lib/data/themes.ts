@@ -30,16 +30,19 @@ export const THEMES: Theme[] = [
         text: 'I thought there would be a setup wizard or something. Our last tool had a guided tour that walked us through everything.',
         account: 'Zenith Holdings',
         date: '2025-03-22',
+        callId: '67',
       },
       {
         text: "How do I set different permission levels for different team members? It's not obvious from the UI at all.",
         account: 'Paradigm Inc',
         date: '2025-03-19',
+        callId: '23',
       },
       {
         text: "We've been trying to get the team set up for a week. The documentation doesn't match what we see in the product.",
         account: 'Orbit Media',
         date: '2025-03-15',
+        callId: '44',
       },
     ],
     relatedCalls: [
@@ -78,16 +81,19 @@ export const THEMES: Theme[] = [
         text: "I didn't authorise any upgrade. This must be a mistake — we never requested additional storage.",
         account: 'Keystone Analytics',
         date: '2025-03-24',
+        callId: '14',
       },
       {
         text: "I was charged $1,200 for the annual plan and also $120 for April separately. That can't be right.",
         account: 'Momentum LLC',
         date: '2025-03-15',
+        callId: '55',
       },
       {
         text: "We submitted our tax exemption certificate weeks ago but we're still being charged state sales tax.",
         account: 'Crestline Finance',
         date: '2025-03-16',
+        callId: '71',
       },
     ],
     relatedCalls: [
@@ -126,16 +132,19 @@ export const THEMES: Theme[] = [
         text: "We can't access the dashboard at all. It's been down for over an hour and we have a client presentation in two hours.",
         account: 'TechVentures Inc',
         date: '2025-03-27',
+        callId: '2',
       },
       {
         text: "After your update last week, nobody on our team can get past the login screen. We're getting an authentication error.",
         account: 'Summit Technologies',
         date: '2025-03-25',
+        callId: '76',
       },
       {
         text: "Is there a known issue with SSO? We've had three people unable to log in this morning.",
         account: 'Vertex Corp',
         date: '2025-03-24',
+        callId: '58',
       },
     ],
     relatedCalls: [
@@ -174,16 +183,19 @@ export const THEMES: Theme[] = [
         text: "We need to export usage data for a custom date range — say, fiscal quarter — not just the preset monthly view.",
         account: 'Atlas Software',
         date: '2025-03-14',
+        callId: '93',
       },
       {
         text: "The CSV export button has just disappeared from the Reports tab. We rely on this for our Monday morning reports.",
         account: 'Apex Industries',
         date: '2025-03-18',
+        callId: '48',
       },
       {
         text: "Is there a way to schedule reports to email to my VP automatically? We have to do this manually every week.",
         account: 'Crestline Finance',
         date: '2025-03-12',
+        callId: '66',
       },
     ],
     relatedCalls: [
@@ -222,16 +234,19 @@ export const THEMES: Theme[] = [
         text: "We submitted that ticket three days ago. Our contract says 24-hour response and we've heard nothing.",
         account: 'Eclipse Solutions',
         date: '2025-03-21',
+        callId: '41',
       },
       {
         text: "If this keeps happening, we're going to have to reconsider whether this platform is right for us.",
         account: 'Eclipse Solutions',
         date: '2025-03-21',
+        callId: '41',
       },
       {
         text: "I opened a P1 ticket on Tuesday. It's Friday and I still haven't had an acknowledgement.",
         account: 'Horizon Dynamics',
         date: '2025-03-14',
+        callId: '53',
       },
     ],
     relatedCalls: [
@@ -269,16 +284,19 @@ export const THEMES: Theme[] = [
         text: "We're going through budget cuts and have to reduce our software spend significantly this quarter.",
         account: 'Horizon Dynamics',
         date: '2025-03-20',
+        callId: '32',
       },
       {
         text: "We've been happy with the product — it's purely a budget issue. If the price was lower we'd stay.",
         account: 'Horizon Dynamics',
         date: '2025-03-20',
+        callId: '32',
       },
       {
         text: "We're evaluating two alternatives right now. If you can't match their pricing, we'll be moving.",
         account: 'Catalyst Group',
         date: '2025-03-13',
+        callId: '17',
       },
     ],
     relatedCalls: [

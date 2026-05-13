@@ -111,6 +111,9 @@ export function ResultCard({ result, query }: ResultCardProps) {
         bg="var(--chakra-colors-bg-subtle)"
       >
         <Flex align="center" gap={2} mb={1.5}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--chakra-colors-fg-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <path d="M12 3 9 9 3 12l6 3 3 6 3-6 6-3-6-3z" />
+          </svg>
           <Text fontSize="xs" fontWeight="semibold" letterSpacing="wider" textTransform="uppercase" color="var(--chakra-colors-fg-muted)">
             AI Summary
           </Text>
