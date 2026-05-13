@@ -1,4 +1,5 @@
 export type { Transcript, TranscriptLine, TranscriptWithLines } from '@/lib/types'
+import type { Transcript, TranscriptLine, TranscriptWithLines } from '@/lib/types'
 
 // ── Static lookup tables ───────────────────────────────────────────────────
 

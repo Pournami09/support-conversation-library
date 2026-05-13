@@ -8,7 +8,7 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
       <Sidebar />
       <Flex flex={1} flexDirection="column" overflow="hidden">
         <TopBar />
-        <Box flex={1} overflowY="auto">
+        <Box as="main" flex={1} minH={0} overflowY="auto" bg="var(--chakra-colors-bg-subtle)">
           {children}
         </Box>
       </Flex>

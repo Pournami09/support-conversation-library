@@ -11,6 +11,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <style>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+          }
           @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
               animation-duration: 0.01ms !important;

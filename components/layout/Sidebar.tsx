@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { Box, Flex, Stack, Text } from '@chakra-ui/react'
+import { Badge, Box, Flex, Stack, Text } from '@chakra-ui/react'
 import Link from 'next/link'
 
 // ── Icon helpers ──────────────────────────────────────────────────────────
@@ -50,54 +50,121 @@ const PATHS = {
   sliders:    "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
   tag:        "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z",
   plug:       "M12 18h.01M8 21l4-4 4 4M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+  trendDown:  "M13 17h8m0 0V9m0 8l-8-8-4 4-6-6",
+  bookmark:   "M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z",
+  billing:    "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z",
+  shield:     "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  rocket:     "M13 10V3L4 14h7v7l9-11h-7z",
+  eye:           "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8M12 9a3 3 0 100 6 3 3 0 000-6",
+  fileText:      "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
+  alertTriangle: "M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01",
+  arrowUpRight:  "M7 17L17 7M7 7h10v10",
+  hash:          "M4 9h16M4 15h16M10 3L8 21M16 3l-2 18",
 }
 
 // ── Nav structure ─────────────────────────────────────────────────────────
 
-interface SubItem  { label: string; href: string; icon: string }
-interface Section  { id: string; label: string; icon: string; items: SubItem[] }
+interface SubItem {
+  label: string
+  href: string
+  icon?: string           // left icon key (omit when using dot)
+  count?: number          // right badge count
+  countPalette?: string   // badge color palette
+  dot?: string            // colored dot: 'red' | 'yellow' | 'orange' | 'gray'
+  rightIcon?: string      // right icon key (Surfacing Now style)
+  rightIconColor?: string // 'red' | 'orange'
+}
+interface SubGroup { label: string; items: SubItem[] }
+interface Section {
+  id: string; label: string; icon: string
+  panelTitle?: string   // custom header label
+  panelIcon?: string    // custom header icon key
+  groups?: SubGroup[]   // grouped layout; overrides flat items when present
+  items: SubItem[]
+}
 
 const NAV_SECTIONS: Section[] = [
   {
-    id: 'home', label: 'Home', icon: 'home',
-    items: [
-      { label: 'Dashboard',       href: '/',           icon: 'grid'      },
-      { label: 'Recent Activity', href: '/activity',   icon: 'clock'     },
-      { label: 'Favorites',       href: '/favorites',  icon: 'star'      },
+    id: 'qa', label: 'QA', icon: 'reviews',
+    panelTitle: 'QA Workspace', panelIcon: 'reviews',
+    groups: [
+      {
+        label: 'Workspace',
+        items: [
+          { label: 'Scoring Queue', href: '/qa/queue',       icon: 'listCheck' },
+          { label: 'Rubrics',       href: '/qa/rubrics',     icon: 'reviews'   },
+          { label: 'Monitoring',    href: '/qa/monitoring',  icon: 'eye'       },
+          { label: 'Saved Views',   href: '/qa/saved-views', icon: 'bookmark'  },
+          { label: 'Reports',       href: '/qa/reports',     icon: 'fileText'  },
+        ],
+      },
+      {
+        label: 'Needs Attention',
+        items: [
+          { label: 'Low Quality',       href: '/qa/low-quality',       icon: 'alertTriangle', count: 24, countPalette: 'red'    },
+          { label: 'Escalated',         href: '/qa/escalated',         icon: 'arrowUpRight',  count: 12, countPalette: 'red'    },
+          { label: 'Pending >48h',      href: '/qa/pending',           icon: 'clock',         count: 15, countPalette: 'yellow' },
+          { label: 'Policy Violations', href: '/qa/policy-violations', icon: 'flag',          count: 7,  countPalette: 'gray'   },
+        ],
+      },
+      {
+        label: 'Coaching',
+        items: [
+          { label: 'Coaching Queue', href: '/qa/coaching', icon: 'userCheck', count: 19, countPalette: 'gray' },
+        ],
+      },
+      {
+        label: 'My Teams',
+        items: [
+          { label: 'Tier 1 Support',      href: '/qa/teams/tier-1',     icon: 'users' },
+          { label: 'Billing Specialists', href: '/qa/teams/billing',    icon: 'users' },
+          { label: 'Enterprise',          href: '/qa/teams/enterprise', icon: 'users' },
+        ],
+      },
     ],
+    items: [],
   },
   {
-    id: 'transcripts', label: 'Transcripts', icon: 'transcripts',
-    items: [
-      { label: 'All Calls',    href: '/transcripts',          icon: 'phone'      },
-      { label: 'Flagged',      href: '/transcripts/flagged',  icon: 'flag'       },
-      { label: 'Needs Review', href: '/transcripts/review',   icon: 'clock'      },
-      { label: 'Archived',     href: '/transcripts/archived', icon: 'archive'    },
+    id: 'insights', label: 'Insights', icon: 'analytics',
+    panelTitle: 'Insights', panelIcon: 'analytics',
+    groups: [
+      {
+        label: 'Library',
+        items: [
+          { label: 'Collections',    href: '/collections',              icon: 'archive'   },
+          { label: 'Trends',         href: '/insights/trends',          icon: 'trendUp'   },
+          { label: 'Digest',         href: '/insights/digest',          icon: 'grid'      },
+          { label: 'Evidence Board', href: '/insights/evidence-board',  icon: 'flag'      },
+          { label: 'Reports',        href: '/insights/reports',         icon: 'fileText'  },
+        ],
+      },
+      {
+        label: 'Surfacing Now',
+        items: [
+          { label: 'SSO spike +34%',       href: '/themes?theme=sso-login-failures',    dot: 'red',    rightIcon: 'trendUp',      rightIconColor: 'red'    },
+          { label: '2 high-risk accounts', href: '/search?q=churn+risk',               dot: 'red',    rightIcon: 'alertTriangle', rightIconColor: 'orange' },
+          { label: 'Billing rising +18%',  href: '/themes?theme=billing-confusion',    dot: 'yellow', rightIcon: 'trendUp',      rightIconColor: 'orange' },
+          { label: 'Onboarding friction',  href: '/themes?theme=onboarding-friction',  dot: 'gray'   },
+        ],
+      },
+      {
+        label: 'Saved Views',
+        items: [
+          { label: 'SSO issues — Enterprise', href: '/search?q=sso',        icon: 'bookmark' },
+          { label: 'Billing Q1 trends',       href: '/search?q=billing',    icon: 'bookmark' },
+          { label: 'At-risk accounts',        href: '/search?q=churn+risk', icon: 'bookmark' },
+        ],
+      },
+      {
+        label: 'Browse By',
+        items: [
+          { label: 'Topics',      href: '/insights/topics',   icon: 'hash'        },
+          { label: 'Accounts',    href: '/insights/accounts', icon: 'building'    },
+          { label: 'Transcripts', href: '/transcripts',       icon: 'transcripts' },
+        ],
+      },
     ],
-  },
-  {
-    id: 'reviews', label: 'Reviews', icon: 'reviews',
-    items: [
-      { label: 'My Queue',    href: '/reviews/queue',     icon: 'listCheck'  },
-      { label: 'Team Queue',  href: '/reviews/team',      icon: 'users'      },
-      { label: 'Completed',   href: '/reviews/completed', icon: 'checkCircle'},
-    ],
-  },
-  {
-    id: 'analytics', label: 'Analytics', icon: 'analytics',
-    items: [
-      { label: 'Overview',          href: '/analytics',         icon: 'grid'      },
-      { label: 'Agent Performance', href: '/analytics/agents',  icon: 'userCheck' },
-      { label: 'Quality Scores',    href: '/analytics/quality', icon: 'star'      },
-      { label: 'Trends',            href: '/analytics/trends',  icon: 'trendUp'   },
-    ],
-  },
-  {
-    id: 'customers', label: 'Customers', icon: 'customers',
-    items: [
-      { label: 'All Customers', href: '/customers',          icon: 'users'    },
-      { label: 'Accounts',      href: '/customers/accounts', icon: 'building' },
-    ],
+    items: [],
   },
 ]
 
@@ -165,12 +232,17 @@ function RailTooltip({ label, children }: { label: string; children: React.React
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 function getActiveSectionId(pathname: string): string {
-  if (pathname.startsWith('/transcripts')) return 'transcripts'
-  if (pathname.startsWith('/reviews'))     return 'reviews'
-  if (pathname.startsWith('/analytics'))   return 'analytics'
-  if (pathname.startsWith('/customers'))   return 'customers'
-  if (pathname.startsWith('/settings'))    return 'settings'
-  return 'home'
+  if (pathname.startsWith('/qa'))           return 'qa'
+  if (pathname.startsWith('/insights'))     return 'insights'
+  if (pathname.startsWith('/collections'))  return 'insights'
+  if (pathname.startsWith('/settings'))     return 'settings'
+  // Legacy paths — map to nearest new section
+  if (pathname.startsWith('/transcripts'))  return 'qa'
+  if (pathname.startsWith('/search'))       return 'qa'
+  if (pathname.startsWith('/reviews'))      return 'qa'
+  if (pathname.startsWith('/themes'))       return 'insights'
+  if (pathname.startsWith('/customers'))    return 'insights'
+  return 'qa'
 }
 
 function isSubActive(href: string, pathname: string): boolean {
@@ -183,32 +255,68 @@ function isSubActive(href: string, pathname: string): boolean {
 function SubNavItem({ item, pathname }: { item: SubItem; pathname: string }) {
   const active = isSubActive(item.href, pathname)
   return (
-    <Box
-      as={Link}
-      href={item.href}
-      display="flex"
-      alignItems="center"
-      gap={3}
-      px={3}
-      py="7px"
-      rounded="sm"
-      bg={active ? 'var(--chakra-colors-blue-50)' : 'transparent'}
-      color={active ? 'var(--chakra-colors-blue-700)' : 'var(--chakra-colors-fg-default)'}
-      _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-700)' }}
-      transition="background-color 0.15s ease, color 0.15s ease"
-    >
+    <Link href={item.href} style={{ textDecoration: 'none' }}>
       <Box
-        flexShrink={0}
-        color={active ? 'var(--chakra-colors-blue-500)' : 'var(--chakra-colors-fg-muted)'}
         display="flex"
         alignItems="center"
+        gap={2.5}
+        px={3}
+        py="7px"
+        rounded="sm"
+        bg={active ? 'var(--chakra-colors-blue-50)' : 'transparent'}
+        color={active ? 'var(--chakra-colors-blue-700)' : 'var(--chakra-colors-fg-default)'}
+        _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-700)' }}
+        transition="background-color 0.15s ease, color 0.15s ease"
       >
-        <Sub d={PATHS[item.icon as keyof typeof PATHS] ?? PATHS.grid} />
+        {/* Left: colored dot OR icon */}
+        {item.dot ? (
+          <Box
+            w="7px" h="7px" rounded="full" flexShrink={0}
+            bg={
+              item.dot === 'red'    ? 'var(--chakra-colors-red-500)'    :
+              item.dot === 'yellow' ? 'var(--chakra-colors-yellow-400)' :
+              item.dot === 'orange' ? 'var(--chakra-colors-orange-400)' :
+                                     'var(--chakra-colors-gray-400)'
+            }
+          />
+        ) : item.icon ? (
+          <Box
+            flexShrink={0}
+            color={active ? 'var(--chakra-colors-blue-500)' : 'var(--chakra-colors-fg-muted)'}
+            display="flex" alignItems="center"
+          >
+            <Sub d={PATHS[item.icon as keyof typeof PATHS] ?? PATHS.grid} />
+          </Box>
+        ) : null}
+
+        {/* Label */}
+        <Text fontSize="sm" fontWeight={active ? 'medium' : 'normal'} lineHeight="none" flex={1}>
+          {item.label}
+        </Text>
+
+        {/* Right: count badge OR trend icon */}
+        {item.count !== undefined && (
+          <Badge
+            colorPalette={item.countPalette ?? 'gray'}
+            variant="subtle" size="xs" rounded="sm" flexShrink={0}
+          >
+            {item.count}
+          </Badge>
+        )}
+        {item.rightIcon && (
+          <Box
+            flexShrink={0} display="flex" alignItems="center"
+            color={
+              item.rightIconColor === 'red'    ? 'var(--chakra-colors-red-500)'    :
+              item.rightIconColor === 'orange' ? 'var(--chakra-colors-orange-500)' :
+                                                 'var(--chakra-colors-fg-muted)'
+            }
+          >
+            <Sub d={PATHS[item.rightIcon as keyof typeof PATHS] ?? PATHS.grid} />
+          </Box>
+        )}
       </Box>
-      <Text fontSize="sm" fontWeight={active ? 'medium' : 'normal'} lineHeight="none">
-        {item.label}
-      </Text>
-    </Box>
+    </Link>
   )
 }
 
@@ -235,27 +343,59 @@ function SecondaryPanel({
       borderColor="var(--chakra-colors-border-subtle)"
       bg="var(--chakra-colors-bg-panel)"
     >
-      <Box w="216px" h="full" display="flex" flexDirection="column" pt={5} pb={4}>
-        {section && (
+      <Box w="216px" h="full" display="flex" flexDirection="column" overflowY="auto">
+        {section && (section.groups ? (
+          // ── Grouped layout (QA, Insights) ────────────────────────────────
+          <>
+            <Flex align="center" gap={2} px={4} pt={5} pb={3} flexShrink={0}>
+              <Box color="var(--chakra-colors-fg-muted)" display="flex" alignItems="center">
+                <Sub d={PATHS[(section.panelIcon ?? section.icon) as keyof typeof PATHS] ?? PATHS.grid} />
+              </Box>
+              <Text fontSize="sm" fontWeight="semibold" color="var(--chakra-colors-fg-default)">
+                {section.panelTitle ?? section.label}
+              </Text>
+            </Flex>
+
+            {section.groups.map((group, gi) => (
+              <Box key={group.label}>
+                {gi > 0 && (
+                  <Box h="1px" w="full" bg="var(--chakra-colors-border-subtle)" mt={2} />
+                )}
+                <Text
+                  fontSize="10px" fontWeight="semibold"
+                  color="var(--chakra-colors-fg-muted)"
+                  letterSpacing="wider" textTransform="uppercase"
+                  px={3} pt={gi > 0 ? 3 : 0} pb={1}
+                >
+                  {group.label}
+                </Text>
+                <Stack gap={0.5} px={2}>
+                  {group.items.map(item => (
+                    <SubNavItem key={item.href} item={item} pathname={pathname} />
+                  ))}
+                </Stack>
+              </Box>
+            ))}
+            <Box pb={4} />
+          </>
+        ) : (
+          // ── Flat layout (Settings) ────────────────────────────────────────
           <>
             <Text
-              fontSize="xs"
-              fontWeight="semibold"
+              fontSize="xs" fontWeight="semibold"
               color="var(--chakra-colors-fg-muted)"
-              letterSpacing="wider"
-              px={3}
-              mb={2}
-              textTransform="uppercase"
+              letterSpacing="wider" textTransform="uppercase"
+              px={3} pt={5} mb={2}
             >
               {section.label}
             </Text>
-            <Stack gap={0.5} px={2} flex={1}>
+            <Stack gap={0.5} px={2} flex={1} pb={4}>
               {section.items.map(item => (
                 <SubNavItem key={item.href} item={item} pathname={pathname} />
               ))}
             </Stack>
           </>
-        )}
+        ))}
       </Box>
     </Box>
   )
@@ -276,6 +416,7 @@ function RailItem({
     <RailTooltip label={label}>
       <Box
         as="button"
+        aria-label={label}
         onClick={onClick}
         display="flex"
         alignItems="center"
@@ -363,21 +504,21 @@ export function Sidebar() {
         {/* Footer icons */}
         <Stack gap={1} align="center">
           <RailTooltip label="Help">
-            <Box
-              as={Link}
-              href="/help"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              w="40px"
-              h="40px"
-              rounded="sm"
-              color="var(--chakra-colors-fg-muted)"
-              _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-600)' }}
-              transition="background-color 0.15s ease, color 0.15s ease"
-            >
-              <Rail d={PATHS.help} />
-            </Box>
+            <Link href="/help" aria-label="Help">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                w="40px"
+                h="40px"
+                rounded="sm"
+                color="var(--chakra-colors-fg-muted)"
+                _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-600)' }}
+                transition="background-color 0.15s ease, color 0.15s ease"
+              >
+                <Rail d={PATHS.help} />
+              </Box>
+            </Link>
           </RailTooltip>
 
           {FOOTER_SECTIONS.map(s => (
@@ -393,23 +534,23 @@ export function Sidebar() {
 
           {/* Profile avatar */}
           <RailTooltip label="Profile">
-            <Box
-              as={Link}
-              href="/profile"
-              w="32px"
-              h="32px"
-              rounded="full"
-              bg="var(--chakra-colors-blue-500)"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              mt={1}
-              flexShrink={0}
-              _hover={{ opacity: 0.85 }}
-              transition="opacity 0.15s ease"
-            >
-              <Text fontSize="10px" fontWeight="bold" color="white">PP</Text>
-            </Box>
+            <Link href="/profile" aria-label="Profile">
+              <Box
+                w="32px"
+                h="32px"
+                rounded="full"
+                bg="var(--chakra-colors-blue-700)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                mt={1}
+                flexShrink={0}
+                _hover={{ opacity: 0.85 }}
+                transition="opacity 0.15s ease"
+              >
+                <Text fontSize="10px" fontWeight="bold" color="white">PP</Text>
+              </Box>
+            </Link>
           </RailTooltip>
         </Stack>
       </Flex>
