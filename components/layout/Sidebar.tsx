@@ -85,19 +85,22 @@ interface Section {
 
 const NAV_SECTIONS: Section[] = [
   {
+    id: 'calls', label: 'Calls', icon: 'phone',
+    panelTitle: 'Calls', panelIcon: 'phone',
+    groups: [
+      {
+        label: 'Browse',
+        items: [
+          { label: 'All Calls', href: '/transcripts', icon: 'transcripts' },
+        ],
+      },
+    ],
+    items: [],
+  },
+  {
     id: 'qa', label: 'QA', icon: 'reviews',
     panelTitle: 'QA Workspace', panelIcon: 'reviews',
     groups: [
-      {
-        label: 'Workspace',
-        items: [
-          { label: 'Scoring Queue', href: '/qa/queue',       icon: 'listCheck' },
-          { label: 'Rubrics',       href: '/qa/rubrics',     icon: 'reviews'   },
-          { label: 'Monitoring',    href: '/qa/monitoring',  icon: 'eye'       },
-          { label: 'Saved Views',   href: '/qa/saved-views', icon: 'bookmark'  },
-          { label: 'Reports',       href: '/qa/reports',     icon: 'fileText'  },
-        ],
-      },
       {
         label: 'Needs Attention',
         items: [
@@ -105,6 +108,16 @@ const NAV_SECTIONS: Section[] = [
           { label: 'Escalated',         href: '/qa/escalated',         icon: 'arrowUpRight',  count: 12, countPalette: 'red'    },
           { label: 'Pending >48h',      href: '/qa/pending',           icon: 'clock',         count: 15, countPalette: 'yellow' },
           { label: 'Policy Violations', href: '/qa/policy-violations', icon: 'flag',          count: 7,  countPalette: 'gray'   },
+        ],
+      },
+      {
+        label: 'QA Workspace',
+        items: [
+          { label: 'Scoring Queue', href: '/qa/queue',       icon: 'listCheck' },
+          { label: 'Rubrics',       href: '/qa/rubrics',     icon: 'reviews'   },
+          { label: 'Monitoring',    href: '/qa/monitoring',  icon: 'eye'       },
+          { label: 'Pinned Views',   href: '/qa/saved-views', icon: 'bookmark'  },
+          { label: 'Reports',       href: '/qa/reports',     icon: 'fileText'  },
         ],
       },
       {
@@ -129,16 +142,6 @@ const NAV_SECTIONS: Section[] = [
     panelTitle: 'Insights', panelIcon: 'analytics',
     groups: [
       {
-        label: 'Library',
-        items: [
-          { label: 'Collections',    href: '/collections',              icon: 'archive'   },
-          { label: 'Trends',         href: '/insights/trends',          icon: 'trendUp'   },
-          { label: 'Digest',         href: '/insights/digest',          icon: 'grid'      },
-          { label: 'Evidence Board', href: '/insights/evidence-board',  icon: 'flag'      },
-          { label: 'Reports',        href: '/insights/reports',         icon: 'fileText'  },
-        ],
-      },
-      {
         label: 'Surfacing Now',
         items: [
           { label: 'SSO spike +34%',       href: '/themes?theme=sso-login-failures',    dot: 'red',    rightIcon: 'trendUp',      rightIconColor: 'red'    },
@@ -148,7 +151,16 @@ const NAV_SECTIONS: Section[] = [
         ],
       },
       {
-        label: 'Saved Views',
+        label: 'Insights Library',
+        items: [
+          { label: 'Collections',    href: '/collections',              icon: 'archive'   },
+          { label: 'Insights Hub',   href: '/insights/trends',          icon: 'trendUp'   },
+          { label: 'Evidence Board', href: '/insights/evidence-board',  icon: 'flag'      },
+          { label: 'Reports',        href: '/insights/reports',         icon: 'fileText'  },
+        ],
+      },
+      {
+        label: 'Pinned Views',
         items: [
           { label: 'SSO issues — Enterprise', href: '/search?q=sso',        icon: 'bookmark' },
           { label: 'Billing Q1 trends',       href: '/search?q=billing',    icon: 'bookmark' },
@@ -158,9 +170,8 @@ const NAV_SECTIONS: Section[] = [
       {
         label: 'Browse By',
         items: [
-          { label: 'Topics',      href: '/insights/topics',   icon: 'hash'        },
-          { label: 'Accounts',    href: '/insights/accounts', icon: 'building'    },
-          { label: 'Transcripts', href: '/transcripts',       icon: 'transcripts' },
+          { label: 'Topics',   href: '/insights/topics',   icon: 'hash'     },
+          { label: 'Accounts', href: '/insights/accounts', icon: 'building' },
         ],
       },
     ],
@@ -232,17 +243,17 @@ function RailTooltip({ label, children }: { label: string; children: React.React
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 function getActiveSectionId(pathname: string): string {
+  if (pathname === '/')                     return 'home'
+  if (pathname.startsWith('/transcripts'))  return 'calls'
+  if (pathname.startsWith('/search'))       return 'calls'
   if (pathname.startsWith('/qa'))           return 'qa'
   if (pathname.startsWith('/insights'))     return 'insights'
   if (pathname.startsWith('/collections'))  return 'insights'
   if (pathname.startsWith('/settings'))     return 'settings'
-  // Legacy paths — map to nearest new section
-  if (pathname.startsWith('/transcripts'))  return 'qa'
-  if (pathname.startsWith('/search'))       return 'qa'
   if (pathname.startsWith('/reviews'))      return 'qa'
   if (pathname.startsWith('/themes'))       return 'insights'
   if (pathname.startsWith('/customers'))    return 'insights'
-  return 'qa'
+  return 'calls'
 }
 
 function isSubActive(href: string, pathname: string): boolean {
@@ -356,26 +367,38 @@ function SecondaryPanel({
               </Text>
             </Flex>
 
-            {section.groups.map((group, gi) => (
-              <Box key={group.label}>
-                {gi > 0 && (
+            {section.groups.map((group, gi) => {
+              const isAttention = group.label === 'Needs Attention' || group.label === 'Surfacing Now'
+              return (
+              <Box
+                key={group.label}
+                bg={isAttention ? 'var(--chakra-colors-bg-subtle)' : 'transparent'}
+                mx={isAttention ? 2 : 0}
+                rounded={isAttention ? 'md' : 'none'}
+                mb={isAttention ? 1 : 0}
+              >
+                {gi > 0 && !isAttention && (
                   <Box h="1px" w="full" bg="var(--chakra-colors-border-subtle)" mt={2} />
+                )}
+                {gi > 0 && isAttention && (
+                  <Box h="1px" w="full" bg="var(--chakra-colors-border-subtle)" mt={2} mb={0} mx={-2} />
                 )}
                 <Text
                   fontSize="10px" fontWeight="semibold"
                   color="var(--chakra-colors-fg-muted)"
                   letterSpacing="wider" textTransform="uppercase"
-                  px={3} pt={gi > 0 ? 3 : 0} pb={1}
+                  px={3} pt={gi > 0 ? 3 : 3} pb={1}
                 >
                   {group.label}
                 </Text>
-                <Stack gap={0.5} px={2}>
+                <Stack gap={0.5} px={2} pb={isAttention ? 1.5 : 0}>
                   {group.items.map(item => (
                     <SubNavItem key={item.href} item={item} pathname={pathname} />
                   ))}
                 </Stack>
               </Box>
-            ))}
+              )
+            })}
             <Box pb={4} />
           </>
         ) : (
@@ -442,7 +465,7 @@ function RailItem({
 export function Sidebar() {
   const pathname = usePathname()
   const [activeId, setActiveId]   = useState(() => getActiveSectionId(pathname))
-  const [panelOpen, setPanelOpen] = useState(true)
+  const [panelOpen, setPanelOpen] = useState(() => getActiveSectionId(pathname) !== 'home')
 
   const allSections = [...NAV_SECTIONS, ...FOOTER_SECTIONS]
 
@@ -489,6 +512,22 @@ export function Sidebar() {
 
         {/* Main section icons */}
         <Stack gap={1} flex={1} align="center" justify="flex-start">
+          {/* Home — direct link, no secondary panel */}
+          <RailTooltip label="Home">
+            <Link href="/" aria-label="Home" onClick={() => { setActiveId('home'); setPanelOpen(false) }}>
+              <Box
+                display="flex" alignItems="center" justifyContent="center"
+                w="40px" h="40px" rounded="sm"
+                bg={activeId === 'home' ? 'var(--chakra-colors-blue-100)' : 'transparent'}
+                color={activeId === 'home' ? 'var(--chakra-colors-blue-600)' : 'var(--chakra-colors-fg-muted)'}
+                _hover={{ bg: 'var(--chakra-colors-blue-50)', color: 'var(--chakra-colors-blue-600)' }}
+                transition="background-color 0.15s ease, color 0.15s ease"
+              >
+                <Rail d={PATHS.home} />
+              </Box>
+            </Link>
+          </RailTooltip>
+
           {NAV_SECTIONS.map(s => (
             <RailItem
               key={s.id}

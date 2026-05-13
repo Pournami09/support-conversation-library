@@ -1,6 +1,9 @@
+'use client'
+
 import { Badge, Box, Flex, Table, Text } from '@chakra-ui/react'
 import Link from 'next/link'
 import type { CallDetailData } from '@/lib/types'
+import { AgentName } from '@/components/agent/AgentName'
 
 const SEVERITY_PALETTE: Record<string, string> = {
   critical: 'red', high: 'orange', medium: 'yellow', low: 'gray',
@@ -85,9 +88,7 @@ export function CallsTable({ calls }: { calls: CallDetailData[] }) {
                 </Link>
               </Table.Cell>
               <Table.Cell py={3} px={4}>
-                <Link href={`/transcripts/${call.id}`} style={{ display: 'block' }}>
-                  <Text fontSize="sm" color="var(--chakra-colors-fg-default)">{call.agentName}</Text>
-                </Link>
+                <AgentName name={call.agentName} size="sm" />
               </Table.Cell>
               <Table.Cell py={3} px={4}>
                 <Link href={`/transcripts/${call.id}`} style={{ display: 'block' }}>

@@ -142,7 +142,7 @@ function pick<T>(arr: T[], index: number): T {
 }
 
 function generateDate(index: number): string {
-  const base = new Date('2025-03-28')
+  const base = new Date()
   base.setDate(base.getDate() - (index % 90))
   return `${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`
 }

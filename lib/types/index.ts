@@ -93,6 +93,7 @@ export interface ThemeQuote {
   text: string
   account: string
   date: string
+  callId?: string
 }
 
 export interface ThemeCall {

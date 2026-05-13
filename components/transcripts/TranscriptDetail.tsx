@@ -5,17 +5,35 @@ import {
   Badge, Box, Button, CloseButton, Dialog,
   Flex, Grid, Portal, Stack, Text,
 } from '@chakra-ui/react'
+// Grid kept for the two-column page layout below
 import Link from 'next/link'
 import type { TranscriptWithLines } from '@/lib/types'
 
 // ── Metadata card ─────────────────────────────────────────────────────────
 
-function MetaField({ label, value }: { label: string; value: string }) {
+function MetaItem({ label, value }: { label: string; value: string }) {
   return (
-    <Box>
-      <Text fontSize="xs" fontWeight="semibold" letterSpacing="wider" textTransform="uppercase" color="var(--chakra-colors-fg-muted)" mb={1}>{label}</Text>
-      <Text fontSize="sm" color="var(--chakra-colors-fg-default)" fontWeight="medium">{value}</Text>
+    <Box px={4} py={3} flexShrink={0}>
+      <Text fontSize="10px" fontWeight="600" letterSpacing="0.07em" textTransform="uppercase"
+        color="var(--chakra-colors-fg-muted)" mb={0.5}>
+        {label}
+      </Text>
+      <Text fontSize="sm" fontWeight="medium" color="var(--chakra-colors-fg-default)" whiteSpace="nowrap">
+        {value}
+      </Text>
     </Box>
+  )
+}
+
+function VSep() {
+  return (
+    <Box
+      alignSelf="stretch"
+      w="1px"
+      my={2}
+      bg="var(--chakra-colors-border-subtle)"
+      flexShrink={0}
+    />
   )
 }
 
@@ -26,25 +44,61 @@ function MetadataCard({ transcript }: { transcript: TranscriptWithLines }) {
       borderWidth="1px"
       borderColor="var(--chakra-colors-border-subtle)"
       rounded="sm"
-      p={5}
+      overflow="hidden"
       mb={4}
     >
-      <Grid templateColumns="repeat(4, 1fr)" gap={4} mb={transcript.tags.length > 0 ? 4 : 0}>
-        <MetaField label="Date"     value={transcript.date} />
-        <MetaField label="Time"     value={transcript.time} />
-        <MetaField label="Duration" value={transcript.duration} />
-        <MetaField label="Agent"    value={transcript.agentName} />
-        <MetaField label="Customer" value={transcript.customerName} />
-        <MetaField label="Account"  value={transcript.accountName} />
-        <MetaField label="Region"   value={transcript.region} />
-      </Grid>
-      {transcript.tags.length > 0 && (
-        <Flex gap={2}>
-          {transcript.tags.map(tag => (
-            <Badge key={tag} colorPalette="blue" variant="subtle" size="sm">{tag}</Badge>
-          ))}
+      {/* Primary row: people + account */}
+      <Flex
+        align="stretch"
+        borderBottomWidth="1px"
+        borderColor="var(--chakra-colors-border-subtle)"
+        flexWrap="wrap"
+      >
+        <MetaItem label="Agent"    value={transcript.agentName} />
+        <VSep />
+        <MetaItem label="Customer" value={transcript.customerName} />
+        <VSep />
+        <MetaItem label="Account"  value={transcript.accountName} />
+        <VSep />
+        <MetaItem label="Region"   value={transcript.region} />
+      </Flex>
+
+      {/* Secondary row: temporal + tags */}
+      <Flex
+        align="center"
+        bg="var(--chakra-colors-bg-subtle)"
+        flexWrap="wrap"
+        minH="40px"
+      >
+        <Flex align="stretch" flexShrink={0}>
+          <Box px={4} py={2.5} flexShrink={0}>
+            <Flex align="center" gap={1.5}>
+              <Text fontSize="xs" color="var(--chakra-colors-fg-muted)" fontWeight="medium">
+                {transcript.date}
+              </Text>
+              <Text fontSize="xs" color="var(--chakra-colors-fg-subtle)">·</Text>
+              <Text fontSize="xs" color="var(--chakra-colors-fg-muted)" fontWeight="medium">
+                {transcript.time}
+              </Text>
+              <Text fontSize="xs" color="var(--chakra-colors-fg-subtle)">·</Text>
+              <Text fontSize="xs" color="var(--chakra-colors-fg-muted)" fontWeight="medium">
+                {transcript.duration}
+              </Text>
+            </Flex>
+          </Box>
         </Flex>
-      )}
+
+        {transcript.tags.length > 0 && (
+          <>
+            <Box alignSelf="stretch" w="1px" my={1.5} bg="var(--chakra-colors-border-subtle)" flexShrink={0} />
+            <Flex gap={1.5} px={4} py={2.5} flexWrap="wrap" align="center">
+              {transcript.tags.map(tag => (
+                <Badge key={tag} colorPalette="blue" variant="subtle" size="sm" rounded="sm">{tag}</Badge>
+              ))}
+            </Flex>
+          </>
+        )}
+      </Flex>
     </Box>
   )
 }
@@ -263,7 +317,12 @@ function AiPanel() {
           bg="var(--chakra-colors-bg-subtle)"
         >
           <Flex align="center" justify="space-between">
-            <Text fontSize="xs" fontWeight="semibold" letterSpacing="wider" textTransform="uppercase" color="var(--chakra-colors-fg-muted)">AI Summary</Text>
+            <Flex align="center" gap={1.5}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--chakra-colors-fg-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M12 3 9 9 3 12l6 3 3 6 3-6 6-3-6-3z" />
+              </svg>
+              <Text fontSize="xs" fontWeight="semibold" letterSpacing="wider" textTransform="uppercase" color="var(--chakra-colors-fg-muted)">AI Summary</Text>
+            </Flex>
             <Badge colorPalette="blue" variant="subtle" size="sm">Beta</Badge>
           </Flex>
         </Box>
